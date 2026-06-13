@@ -1,0 +1,116 @@
+@* ── Views/Home/Index.cshtml ── *@
+@{ ViewBag.Title = "Accueil"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="text-center py-5" style="background:linear-gradient(135deg,#1565C0,#0D47A1);color:white;border-radius:12px;margin-bottom:2rem">
+  <h1 class="fw-bold display-5">Bienvenue sur <span style="color:#FFD54F">TogoConnect</span></h1>
+  <p class="lead mb-4">La plateforme qui connecte les jeunes togolais aux opportunités professionnelles</p>
+  <div class="d-flex gap-3 justify-content-center">
+    <a href="@Url.Action("Index","Offres")" class="btn btn-warning btn-lg fw-bold">
+      <i class="bi bi-briefcase"></i> Voir les offres
+    </a>
+    @if (!Request.IsAuthenticated) {
+      <a href="@Url.Action("Inscription","Account")" class="btn btn-outline-light btn-lg">
+        <i class="bi bi-person-plus"></i> S'inscrire
+      </a>
+    }
+  </div>
+</div>
+
+<div class="row text-center g-4 mb-5">
+  <div class="col-md-3">
+    <div class="card p-4 h-100 shadow-sm border-0">
+      <i class="bi bi-briefcase-fill text-primary fs-1 mb-3"></i>
+      <h5>Emplois</h5>
+      <p class="text-muted small">Trouvez votre prochain emploi dans les meilleures entreprises togolaises</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 shadow-sm border-0">
+      <i class="bi bi-mortarboard-fill text-success fs-1 mb-3"></i>
+      <h5>Stages</h5>
+      <p class="text-muted small">Décrochez un stage formateur pour lancer votre carrière</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 shadow-sm border-0">
+      <i class="bi bi-book-fill text-warning fs-1 mb-3"></i>
+      <h5>Formations</h5>
+      <p class="text-muted small">Développez vos compétences avec des formations adaptées</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-4 h-100 shadow-sm border-0">
+      <i class="bi bi-calendar-event-fill text-danger fs-1 mb-3"></i>
+      <h5>Événements</h5>
+      <p class="text-muted small">Participez aux événements professionnels et élargissez votre réseau</p>
+    </div>
+  </div>
+</div>
+
+
+@* ── Views/Candidatures/PourOffre.cshtml ── *@
+@* @model List<TogoConnect.Models.Candidature>
+@{ ViewBag.Title = "Candidatures reçues"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="d-flex justify-content-between mb-4">
+  <h3><i class="bi bi-people"></i> Candidatures reçues</h3>
+  <a href="@Url.Action("MesOffres","Offres")" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Mes offres
+  </a>
+</div>
+
+@if (!Model.Any()) {
+  <div class="alert alert-info">Aucune candidature reçue pour cette offre.</div>
+} else {
+  <div class="row g-3">
+    @foreach (var c in Model) {
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="fw-bold">@c.Etudiant?.Utilisateur?.NomComplet</h6>
+                <small class="text-muted"><i class="bi bi-envelope"></i> @c.Etudiant?.Utilisateur?.Email</small><br/>
+                <small class="text-muted"><i class="bi bi-mortarboard"></i> @c.Etudiant?.Filiere</small>
+              </div>
+              <span class="badge @(c.Statut=="acceptee"?"bg-success":c.Statut=="refusee"?"bg-danger":"bg-warning text-dark")">
+                @c.Statut.Replace("_"," ")
+              </span>
+            </div>
+            @if (!string.IsNullOrEmpty(c.LettreMotivation)) {
+              <p class="mt-2 small border-top pt-2">@(c.LettreMotivation.Length>150?c.LettreMotivation.Substring(0,150)+"...":c.LettreMotivation)</p>
+            }
+            @if (!string.IsNullOrEmpty(c.Etudiant?.CheminCV)) {
+              <a href="@Url.Content(c.Etudiant.CheminCV)" target="_blank" class="btn btn-sm btn-outline-secondary mt-2">
+                <i class="bi bi-file-pdf"></i> Voir CV
+              </a>
+            }
+          </div>
+          <div class="card-footer d-flex gap-2">
+            <button class="btn btn-sm btn-success btn-statut" data-id="@c.Id" data-statut="acceptee">
+              <i class="bi bi-check"></i> Accepter
+            </button>
+            <button class="btn btn-sm btn-danger btn-statut" data-id="@c.Id" data-statut="refusee">
+              <i class="bi bi-x"></i> Refuser
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@section Scripts {
+  <script>
+    @Html.AntiForgeryToken()
+    document.querySelectorAll('.btn-statut').forEach(btn => {
+      btn.addEventListener('click', function() {
+        fetch('@Url.Action("ChangerStatut","Candidatures")', {
+          method:'POST',
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          body:'id='+this.dataset.id+'&statut='+this.dataset.statut
+        }).then(r=>r.json()).then(d=>{ if(d.succes) location.reload(); });
+      });
+    });
+  </script>
+} *@

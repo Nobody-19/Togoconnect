@@ -1,0 +1,41 @@
+@{ ViewBag.Title = "Connexion"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h3 class="card-title text-center mb-1">
+          <i class="bi bi-people-fill text-primary"></i> TogoConnect
+        </h3>
+        <p class="text-center text-muted mb-4">L'opportunité à portée de clic</p>
+
+        @if (ViewBag.Erreur != null) {
+          <div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> @ViewBag.Erreur</div>
+        }
+
+        @using (Html.BeginForm("Connexion", "Account", FormMethod.Post)) {
+          @Html.AntiForgeryToken()
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="votre@email.com" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mot de passe</label>
+            <input type="password" name="motDePasse" class="form-control" placeholder="••••••••" required />
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" name="rememberMe" class="form-check-input" id="remember" value="true" />
+            <label class="form-check-label" for="remember">Se souvenir de moi</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2">
+            <i class="bi bi-box-arrow-in-right"></i> Se connecter
+          </button>
+        }
+        <hr />
+        <p class="text-center mb-0">
+          Pas encore de compte ? <a href="@Url.Action("Inscription")">S'inscrire gratuitement</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

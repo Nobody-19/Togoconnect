@@ -1,0 +1,102 @@
+@* ── Views/Dashboard/Index.cshtml ── *@
+@model TogoConnect.ViewModels.DashboardVM
+@{ ViewBag.Title = "Tableau de bord"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<h3 class="mb-4"><i class="bi bi-speedometer2"></i> Bonjour, <strong>@Model.NomUtilisateur</strong> 👋</h3>
+
+@if (Model.Role == "etudiant") {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-bg-primary text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.TotalCandidatures</div>
+        <div class="small">Candidatures</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-bg-warning text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.EnAttente</div>
+        <div class="small">En attente</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-bg-success text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.Acceptees</div>
+        <div class="small">Acceptées</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-bg-danger text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.Refusees</div>
+        <div class="small">Refusées</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mb-3">
+    <h5><i class="bi bi-lightning"></i> Dernières offres</h5>
+    <a href="@Url.Action("Index","Offres")" class="btn btn-sm btn-outline-primary">Voir toutes</a>
+  </div>
+  <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+    @foreach (var offre in Model.DernieresOffres ?? new List<TogoConnect.Models.Offre>()) {
+      <div class="col">
+        <div class="card card-offre p-3 shadow-sm">
+          <span class="badge bg-primary mb-1 w-auto" style="width:fit-content!important">@offre.TypeOffre</span>
+          <h6 class="fw-bold">@offre.Titre</h6>
+          <small class="text-muted"><i class="bi bi-building"></i> @offre.Entreprise?.RaisonSociale – @offre.Localisation</small>
+          <div class="mt-2">
+            <a href="@Url.Action("Details","Offres",new{id=offre.Id})" class="btn btn-sm btn-outline-primary">Postuler</a>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+} else if (Model.Role == "entreprise") {
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card text-bg-primary text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.TotalOffres</div>
+        <div class="small">Offres publiées</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-bg-success text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.OffresActives</div>
+        <div class="small">Offres actives</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-bg-info text-center p-3 shadow-sm">
+        <div class="fs-2 fw-bold">@Model.TotalCandidaturesRecues</div>
+        <div class="small">Candidatures reçues</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mb-3">
+    <h5><i class="bi bi-list-ul"></i> Mes offres récentes</h5>
+    <a href="@Url.Action("Creer","Offres")" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i> Nouvelle offre</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle shadow-sm">
+      <thead class="table-dark">
+        <tr><th>Titre</th><th>Type</th><th>Date limite</th><th>Statut</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        @foreach (var offre in Model.DernieresOffresEnt ?? new List<TogoConnect.Models.Offre>()) {
+          <tr>
+            <td class="fw-semibold">@offre.Titre</td>
+            <td><span class="badge bg-secondary">@offre.TypeOffre</span></td>
+            <td>@offre.DateLimite.ToString("dd/MM/yyyy")</td>
+            <td><span class="badge @(offre.Statut=="active"?"bg-success":"bg-secondary")">@offre.Statut</span></td>
+            <td>
+              <a href="@Url.Action("PourOffre","Candidatures",new{id=offre.Id})" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-people"></i> Candidatures
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

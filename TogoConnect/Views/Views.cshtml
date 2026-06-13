@@ -1,0 +1,169 @@
+@* ============================================================
+   Views/Account/Connexion.cshtml
+   ============================================================ *@
+@{ ViewBag.Title = "Connexion"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h3 class="card-title text-center mb-4"><i class="bi bi-people-fill text-primary"></i> TogoConnect</h3>
+        <h5 class="text-center mb-4">Connexion à votre compte</h5>
+        @if (ViewBag.Erreur != null) { <div class="alert alert-danger">@ViewBag.Erreur</div> }
+        @using (Html.BeginForm("Connexion", "Account", FormMethod.Post)) {
+          @Html.AntiForgeryToken()
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="votre@email.com" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" name="motDePasse" class="form-control" required />
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" name="rememberMe" class="form-check-input" id="remember" />
+            <label class="form-check-label" for="remember">Se souvenir de moi</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right"></i> Se connecter</button>
+        }
+        <hr/>
+        <p class="text-center mb-0">Pas encore de compte ? <a href="@Url.Action("Inscription")">S'inscrire</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@* ============================================================
+   Views/Account/Inscription.cshtml
+   ============================================================ *@
+@* @{ ViewBag.Title = "Inscription"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="row justify-content-center mt-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="mb-4 text-center">Créer un compte</h4>
+        @if (ViewBag.Erreur != null) { <div class="alert alert-danger">@ViewBag.Erreur</div> }
+        @using (Html.BeginForm("Inscription","Account",FormMethod.Post)) {
+          @Html.AntiForgeryToken()
+          <div class="row">
+            <div class="col-md-6 mb-3"><label class="form-label">Nom</label><input name="Nom" class="form-control" required/></div>
+            <div class="col-md-6 mb-3"><label class="form-label">Prénom</label><input name="Prenom" class="form-control" required/></div>
+          </div>
+          <div class="mb-3"><label class="form-label">Email</label><input type="email" name="Email" class="form-control" required/></div>
+          <div class="mb-3"><label class="form-label">Rôle</label>
+            <select name="Role" class="form-select" required>
+              <option value="">Choisir...</option>
+              <option value="etudiant">Étudiant / Demandeur d'emploi</option>
+              <option value="entreprise">Entreprise / Organisation</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Mot de passe</label><input type="password" name="MotDePasse" class="form-control" required/></div>
+          <div class="mb-3"><label class="form-label">Confirmer mot de passe</label><input type="password" name="confirmerMotDePasse" class="form-control" required/></div>
+          <button type="submit" class="btn btn-success w-100"><i class="bi bi-person-plus"></i> Créer mon compte</button>
+        }
+        <p class="text-center mt-3">Déjà inscrit ? <a href="@Url.Action("Connexion")">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+</div> *@
+
+
+@* ============================================================
+   Views/Offres/Index.cshtml
+   ============================================================ *@
+@* @model List<TogoConnect.Models.Offre>
+@{ ViewBag.Title = "Offres disponibles"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="bi bi-briefcase"></i> Offres disponibles</h2>
+  @if (Session["UserRole"] != null && Session["UserRole"].ToString() == "entreprise") {
+    <a href="@Url.Action("Creer")" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Publier une offre</a>
+  }
+</div>
+
+@using (Html.BeginForm("Index","Offres",FormMethod.Get,"class=row g-2 mb-4")) {
+  <div class="col-md-3">
+    <select name="type" class="form-select">
+      <option value="">Tous les types</option>
+      <option value="emploi">Emploi</option>
+      <option value="stage">Stage</option>
+      <option value="formation">Formation</option>
+      <option value="evenement">Événement</option>
+    </select>
+  </div>
+  <div class="col-md-4">
+    <input type="text" name="localisation" class="form-control" placeholder="Ville..." />
+  </div>
+  <div class="col-md-4">
+    <input type="text" name="recherche" class="form-control" placeholder="Rechercher..." />
+  </div>
+  <div class="col-md-1">
+    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+  </div>
+}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+@foreach (var offre in Model) {
+  <div class="col">
+    <div class="card card-offre h-100 shadow-sm">
+      <div class="card-body">
+        <span class="badge badge-type-@offre.TypeOffre mb-2 text-white">@offre.TypeOffre.ToUpper()</span>
+        <h6 class="card-title fw-bold">@offre.Titre</h6>
+        <p class="text-muted small mb-1"><i class="bi bi-building"></i> @offre.Entreprise?.RaisonSociale</p>
+        <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> @offre.Localisation</p>
+        <p class="card-text small">@(offre.Description.Length > 100 ? offre.Description.Substring(0,100) + "..." : offre.Description)</p>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">Expire le @offre.DateLimite.ToString("dd/MM/yyyy")</small>
+        <a href="@Url.Action("Details", new { id=offre.Id })" class="btn btn-sm btn-outline-primary">Voir</a>
+      </div>
+    </div>
+  </div>
+}
+</div> *@
+
+
+@* ============================================================
+   Views/Dashboard/Index.cshtml
+   ============================================================ *@
+@* @model TogoConnect.ViewModels.DashboardVM
+@{ ViewBag.Title = "Tableau de bord"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<h3 class="mb-4"><i class="bi bi-speedometer2"></i> Bonjour, @Model.NomUtilisateur 👋</h3>
+
+@if (Model.Role == "etudiant") {
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card text-bg-primary text-center p-3"><div class="fs-1 fw-bold">@Model.TotalCandidatures</div><div>Candidatures</div></div></div>
+    <div class="col-md-3"><div class="card text-bg-warning text-center p-3"><div class="fs-1 fw-bold">@Model.EnAttente</div><div>En attente</div></div></div>
+    <div class="col-md-3"><div class="card text-bg-success text-center p-3"><div class="fs-1 fw-bold">@Model.Acceptees</div><div>Acceptées</div></div></div>
+    <div class="col-md-3"><div class="card text-bg-danger text-center p-3"><div class="fs-1 fw-bold">@Model.Refusees</div><div>Refusées</div></div></div>
+  </div>
+  <h5>Dernières offres disponibles</h5>
+  <div class="row row-cols-1 row-cols-md-2 g-3">
+  @foreach (var offre in Model.DernieresOffres ?? new List<TogoConnect.Models.Offre>()) {
+    <div class="col"><div class="card p-3 card-offre"><span class="badge bg-primary mb-1">@offre.TypeOffre</span><h6>@offre.Titre</h6><small class="text-muted">@offre.Entreprise?.RaisonSociale – @offre.Localisation</small><div class="mt-2"><a href="@Url.Action("Details","Offres",new{id=offre.Id})" class="btn btn-sm btn-outline-primary">Voir</a></div></div></div>
+  }
+  </div>
+} else if (Model.Role == "entreprise") {
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card text-bg-primary text-center p-3"><div class="fs-1 fw-bold">@Model.TotalOffres</div><div>Offres publiées</div></div></div>
+    <div class="col-md-4"><div class="card text-bg-success text-center p-3"><div class="fs-1 fw-bold">@Model.OffresActives</div><div>Offres actives</div></div></div>
+    <div class="col-md-4"><div class="card text-bg-info text-center p-3"><div class="fs-1 fw-bold">@Model.TotalCandidaturesRecues</div><div>Candidatures reçues</div></div></div>
+  </div>
+  <div class="d-flex justify-content-between mb-3">
+    <h5>Mes offres récentes</h5>
+    <a href="@Url.Action("Creer","Offres")" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Nouvelle offre</a>
+  </div>
+  <table class="table table-hover">
+    <thead><tr><th>Titre</th><th>Type</th><th>Date limite</th><th>Statut</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var offre in Model.DernieresOffresEnt ?? new List<TogoConnect.Models.Offre>()) {
+      <tr>
+        <td>@offre.Titre</td>
+        <td><span class="badge bg-secondary">@offre.TypeOffre</span></td>
+        <td>@offre.DateLimite.ToString("dd/MM/yyyy")</td>
+        <td><span class="badge @(offre.Statut=="active"?"bg-success":"bg-secondary")">@offre.Statut</span></td>
+        <td><a href="@Url.Action("PourOffre","Candidatures",new{id=offre.Id})" class="btn btn-sm btn-outline-info">Candidatures</a></td>
+      </tr>
+    }
+    </tbody>
+  </table>
+} *@

@@ -1,0 +1,59 @@
+@model TogoConnect.Models.Utilisateur
+@{ ViewBag.Title = "Inscription"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row justify-content-center mt-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="mb-4 text-center"><i class="bi bi-person-plus text-primary"></i> Créer un compte</h4>
+
+        @if (ViewBag.Erreur != null) {
+          <div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> @ViewBag.Erreur</div>
+        }
+
+        @using (Html.BeginForm("Inscription", "Account", FormMethod.Post)) {
+          @Html.AntiForgeryToken()
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Nom</label>
+              @Html.TextBoxFor(m => m.Nom, new { @class = "form-control", placeholder = "Votre nom", required = "required" })
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-semibold">Prénom</label>
+              @Html.TextBoxFor(m => m.Prenom, new { @class = "form-control", placeholder = "Votre prénom", required = "required" })
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Adresse email</label>
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "votre@email.com", required = "required" })
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Je suis...</label>
+            @Html.DropDownListFor(m => m.Role, new SelectList(new[] {
+              new { Value = "", Text = "Choisir un rôle..." },
+              new { Value = "etudiant",   Text = "Étudiant / Demandeur d'emploi" },
+              new { Value = "entreprise", Text = "Entreprise / Organisation" }
+            }, "Value", "Text"), new { @class = "form-select", required = "required" })
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mot de passe</label>
+            @Html.PasswordFor(m => m.MotDePasse, new { @class = "form-control", placeholder = "Minimum 8 caractères", required = "required" })
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Confirmer le mot de passe</label>
+            <input type="password" name="confirmerMotDePasse" class="form-control" placeholder="Répétez le mot de passe" required />
+          </div>
+
+          <button type="submit" class="btn btn-success w-100 py-2">
+            <i class="bi bi-check-circle"></i> Créer mon compte
+          </button>
+        }
+        <p class="text-center mt-3 mb-0">Déjà inscrit ? <a href="@Url.Action("Connexion")">Se connecter</a></p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+@model TogoConnect.Models.Offre
+@{ ViewBag.Title = Model.Titre; Layout = "~/Views/Shared/_Layout.cshtml"; }
+
+<div class="row">
+  <div class="col-md-8">
+    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary mb-3">
+      <i class="bi bi-arrow-left"></i> Retour aux offres
+    </a>
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <span class="badge mb-2 text-white" style="background:@(Model.TypeOffre=="emploi"?"#1565C0":Model.TypeOffre=="stage"?"#2E7D32":Model.TypeOffre=="formation"?"#E65100":"#6A1B9A")">
+          @Model.TypeOffre.ToUpper()
+        </span>
+        <h3 class="fw-bold">@Model.Titre</h3>
+        <p class="text-muted">
+          <i class="bi bi-building"></i> @Model.Entreprise?.RaisonSociale &nbsp;|&nbsp;
+          <i class="bi bi-geo-alt"></i> @Model.Localisation &nbsp;|&nbsp;
+          <i class="bi bi-calendar"></i> Expire le @Model.DateLimite.ToString("dd MMMM yyyy")
+        </p>
+        <hr />
+        <h5>Description</h5>
+        <p style="white-space:pre-line">@Model.Description</p>
+
+        @if (!string.IsNullOrEmpty(Model.Competences)) {
+          <h5 class="mt-3">Compétences requises</h5>
+          @foreach (var comp in Model.Competences.Split(',')) {
+            <span class="badge bg-secondary me-1 mb-1">@comp.Trim()</span>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    @if (Session["UserRole"] != null && Session["UserRole"].ToString() == "etudiant") {
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h5><i class="bi bi-send"></i> Postuler</h5>
+          @if (TempData["Succes"] != null) {
+            <div class="alert alert-success">@TempData["Succes"]</div>
+          }
+          @if (TempData["Erreur"] != null) {
+            <div class="alert alert-danger">@TempData["Erreur"]</div>
+          }
+          @using (Html.BeginForm("Postuler", "Offres", FormMethod.Post)) {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="idOffre" value="@Model.Id" />
+            <div class="mb-3">
+              <label class="form-label">Lettre de motivation <small class="text-muted">(optionnel)</small></label>
+              <textarea name="lettreMotivation" class="form-control" rows="6"
+                placeholder="Madame, Monsieur, ..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-success w-100">
+              <i class="bi bi-send-fill"></i> Envoyer ma candidature
+            </button>
+          }
+        </div>
+      </div>
+    } else if (Session["UserRole"] == null) {
+      <div class="card shadow-sm p-4 text-center">
+        <p>Connectez-vous pour postuler à cette offre.</p>
+        <a href="@Url.Action("Connexion","Account")" class="btn btn-primary">Se connecter</a>
+      </div>
+    }
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6><i class="bi bi-building"></i> @Model.Entreprise?.RaisonSociale</h6>
+        <p class="small text-muted">@Model.Entreprise?.Secteur</p>
+        <p class="small">@Model.Entreprise?.Description</p>
+      </div>
+    </div>
+  </div>
+</div>
